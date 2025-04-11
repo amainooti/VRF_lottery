@@ -78,7 +78,7 @@ contract Raffle is VRFConsumerBaseV2 {
         s_raffleState = RaffleState.OPEN;
     }
 
-    function enterraffles() external payable {
+    function enterraffle() external payable {
         if (msg.value <= i_entranceFee) {
             revert NotEnoughETHSent();
         }
@@ -162,5 +162,9 @@ contract Raffle is VRFConsumerBaseV2 {
 
     function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
+    }
+
+    function getRaffleState() external view returns (RaffleState) {
+        return s_raffleState;
     }
 }
