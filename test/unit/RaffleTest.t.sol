@@ -17,6 +17,7 @@ contract RaffleTest is Test {
     uint256 interval;
     address vrfCoordinator;
     bytes32 gasLane;
+
     uint64 subscriptionId;
     uint32 callbackGasLimit;
 
@@ -24,29 +25,42 @@ contract RaffleTest is Test {
         DeployRaffle deployer = new DeployRaffle();
         (raffle, helperConfig) = deployer.run();
 
-        (entranceFee, 
-        interval, 
-        vrfCoordinator, 
-        gasLane, 
-        subscriptionId, 
-        callbackGasLimit) = helperConfig.activeNetworkConfig();
+        (
+            entranceFee,
+            interval,
+            vrfCoordinator,
+            gasLane,
+            subscriptionId,
+            callbackGasLimit
+        ) = helperConfig.activeNetworkConfig();
+
+        // Give player some funds
+        vm.deal(PLAYER, STARTING_USER_BALANCE);
     }
 
-    function testRaffleInitializesInOpenState() public view{
-        assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN); 
+    function testRaffleInitializesInOpenState() public view {
+        assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN);
     }
 
-
-// Enter raffle 
+    // Enter raffle
 
     function testRaffleRevertsWhenYouDontPayEnough() public {
-    // Arrange
+        // Arrange
 
-    vm.prank(PLAYER);
+        vm.prank(PLAYER);
 
-    // Act
-    vm.expectRevert(Raffle.NotEnoughETHSent.selector);
-    raffle.enterraffle();
-    // Assert
+        // Act
+        vm.expectRevert(Raffle.NotEnoughETHSent.selector);
+
+        // Assert
+        raffle.enterraffle();
+    }
+
+    function testRaffleRecordsPlayerWhenTheyEnter() public {
+        vm.prank(PLAYER);
+        raffle.enterraffle{value: entranceFee}();
+        console.log(entranceFee);
+        address playerRecorded = raffle.getPlayer(0);
+        assert(playerRecorded == PLAYER);
     }
 }
