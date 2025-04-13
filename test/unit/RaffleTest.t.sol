@@ -8,6 +8,9 @@ import {DeployRaffle} from "../../script/Deployraffle.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 
 contract RaffleTest is Test {
+    // Events
+    event EnteredRaffle(address indexed player);
+
     Raffle raffle;
     HelperConfig helperConfig;
 
@@ -60,7 +63,30 @@ contract RaffleTest is Test {
         vm.prank(PLAYER);
         raffle.enterraffle{value: entranceFee}();
         console.log(entranceFee);
+        console.log("Contract balance:", address(raffle).balance);
         address playerRecorded = raffle.getPlayer(0);
         assert(playerRecorded == PLAYER);
+    }
+
+    function testemitEventOnentrance() public {
+        vm.prank(PLAYER);
+
+        vm.expectEmit(true, false, false, false, address(raffle));
+
+        emit EnteredRaffle(PLAYER);
+
+        raffle.enterraffle{value: entranceFee}();
+    }
+
+    function testCanEnterWhenRaffleIsCalculating() public {
+        vm.prank(PLAYER);
+        raffle.enterraffle{value: entranceFee}();
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+        raffle.performUpkeep("");
+
+        vm.expectRevert(Raffle.Raffle_NOT_OPEN.selector);
+        vm.prank(PLAYER);
+        raffle.enterraffle{value: entranceFee}();
     }
 }
