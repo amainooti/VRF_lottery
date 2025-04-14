@@ -22,3 +22,5 @@ This code is to create a proveably random smart contract lottery.
       1. Work on a local chain
       2. Forked testnet
       3. Forked mainnet
+
+forge script script/Interactions.s.sol:fundSubscriptionUsingConfig
