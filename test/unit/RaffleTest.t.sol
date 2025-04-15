@@ -6,6 +6,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {Raffle} from "../../src/Raffle.sol";
 import {DeployRaffle} from "../../script/Deployraffle.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract RaffleTest is Test {
     // Events
@@ -171,5 +172,24 @@ contract RaffleTest is Test {
             )
         );
         raffle.performUpkeep("");
+    }
+
+    function testPerformUpkeepUpdatesraffleStateAndEmitsRequest()
+        public
+        enterRaffleAndEnoughtimehaspassed
+    {
+        // Act
+        vm.recordLogs();
+        raffle.performUpkeep(""); // emit the requestID
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+
+        for (uint i = 0; i < entries.length; i++) {
+            console.log("Log Entry", i);
+            console.logBytes32(entries[i].topics[0]);
+            console.log("Data:");
+            console.logBytes(entries[i].data);
+            console.log("Emitter:");
+            console.logAddress(entries[i].emitter);
+        }
     }
 }
