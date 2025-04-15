@@ -23,4 +23,7 @@ This code is to create a proveably random smart contract lottery.
       2. Forked testnet
       3. Forked mainnet
 
-forge script script/Interactions.s.sol:fundSubscriptionUsingConfig
+
+# Remember to pull this before pushing code! 
+- visit https://www.ghostsofepochspast.xyz/
+this allows several vulnerabilities and gives you some experience 
