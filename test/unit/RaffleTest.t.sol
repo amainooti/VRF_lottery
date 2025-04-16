@@ -174,7 +174,7 @@ contract RaffleTest is Test {
         raffle.performUpkeep("");
     }
 
-    function testPerformUpkeepUpdatesraffleStateAndEmitsRequest()
+    function testPerformUpkeepUpdatesraffleStateAndEmitsRequestId()
         public
         enterRaffleAndEnoughtimehaspassed
     {
@@ -182,14 +182,18 @@ contract RaffleTest is Test {
         vm.recordLogs();
         raffle.performUpkeep(""); // emit the requestID
         Vm.Log[] memory entries = vm.getRecordedLogs();
+        bytes32 requestId = entries[0].topics[2];
 
-        for (uint i = 0; i < entries.length; i++) {
-            console.log("Log Entry", i);
-            console.logBytes32(entries[i].topics[0]);
-            console.log("Data:");
-            console.logBytes(entries[i].data);
-            console.log("Emitter:");
-            console.logAddress(entries[i].emitter);
-        }
+        Raffle.RaffleState rstate = raffle.getRaffleState();
+
+        assert(uint256(requestId) > 0);
+        assertEq(uint256(rstate), 1);
+    }
+
+    function testFufillRandomWordsCanOnlyBeCalledAfterPerformUpkeep()
+        public
+        enterRaffleAndEnoughtimehaspassed
+    {
+        vm.expectRevert("nonexistent request");
     }
 }
